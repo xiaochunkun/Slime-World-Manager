@@ -11,14 +11,13 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -56,9 +55,12 @@ public class MysqlLoader extends UpdatableLoader {
     public MysqlLoader(DatasourcesConfig.MysqlConfig config) throws SQLException {
         HikariConfig hikariConfig = new HikariConfig();
 
+        hikariConfig.setDriverClassName("com.grinderwolf.swm.internal.com.mysql.cj.jdbc.Driver");
+
         hikariConfig.setJdbcUrl("jdbc:mysql://" + config.getHost() + ":" + config.getPort() + "/" + config.getDatabase() + "?autoReconnect=true&allowMultiQueries=true");
         hikariConfig.setUsername(config.getUsername());
         hikariConfig.setPassword(config.getPassword());
+
 
         hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
         hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
@@ -70,6 +72,8 @@ public class MysqlLoader extends UpdatableLoader {
         hikariConfig.addDataSourceProperty("cacheServerConfiguration", "true");
         hikariConfig.addDataSourceProperty("elideSetAutoCommits", "true");
         hikariConfig.addDataSourceProperty("maintainTimeStats", "false");
+        hikariConfig.addDataSourceProperty("enabledTLSProtocols","TLSv1.2");
+        hikariConfig.addDataSourceProperty("databaseName",config.getDatabase());
 
         source = new HikariDataSource(hikariConfig);
 
